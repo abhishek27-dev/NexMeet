@@ -8,3 +8,5 @@ frontend/.env
 dist/
 frontend/dist/
 .DS_Store
+*.pdf
+NexMeet_Placement_Guide.pdf
