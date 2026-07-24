@@ -26,12 +26,12 @@ body {
 
 /* ===== LANDING PAGE ===== */
 .landingPageContainer {
-  width: 100vw;
+  width: 100%;
   min-height: 100vh;
   background: linear-gradient(135deg, #0d0d1a 0%, #12122a 50%, #0d1a2a 100%);
   color: white;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 .landingPageContainer::before {
