@@ -1,0 +1,318 @@
+/* ===== GLOBAL ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #6c63ff;
+  --primary-dark: #574fd6;
+  --accent: #00d4aa;
+  --dark: #0d0d1a;
+  --dark2: #12122a;
+  --card: #1a1a35;
+  --text: #e8e8f0;
+  --text-muted: #8888aa;
+  --border: rgba(108, 99, 255, 0.2);
+  --glass: rgba(255, 255, 255, 0.05);
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background: var(--dark);
+  color: var(--text);
+}
+
+/* ===== LANDING PAGE ===== */
+.landingPageContainer {
+  width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #12122a 50%, #0d1a2a 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.landingPageContainer::before {
+  content: "";
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(108, 99, 255, 0.15) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.landingPageContainer::after {
+  content: "";
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(0, 212, 170, 0.1) 0%, transparent 70%);
+  bottom: 50px;
+  left: -50px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* NAV */
+.landingPageContainer nav {
+  padding: 1.4rem 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 10;
+}
+
+.navHeader h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6c63ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.5px;
+}
+
+.navlist {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.navlist p {
+  color: var(--text-muted);
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.navlist p:hover {
+  color: white;
+}
+
+.navlist div[role="button"] {
+  background: var(--primary);
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
+  font-weight: 600;
+}
+
+.navlist div[role="button"]:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* HERO */
+.landingMainContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5rem 5rem;
+  min-height: 85vh;
+  position: relative;
+  z-index: 5;
+}
+
+.connect h1 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+  max-width: 560px;
+}
+
+.connect h1 .highlight {
+  background: linear-gradient(90deg, #6c63ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.connect p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-bottom: 2.5rem;
+  max-width: 440px;
+  line-height: 1.6;
+}
+
+.connect div[role="button"] {
+  background: linear-gradient(135deg, var(--primary), #00d4aa);
+  width: fit-content;
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: 0 8px 30px rgba(108, 99, 255, 0.35);
+}
+
+.connect div[role="button"]:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.heroImg {
+  max-height: 58vh;
+  max-width: 520px;
+  width: 100%;
+  height: auto;
+  border-radius: 22px;
+  border: 1px solid rgba(108, 99, 255, 0.35);
+  box-shadow: 0 20px 60px rgba(108, 99, 255, 0.35), 0 0 35px rgba(0, 212, 170, 0.2);
+  animation: floatHero 5s ease-in-out infinite;
+}
+
+@keyframes floatHero {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* FEATURES STRIP */
+.featuresStrip {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1.5rem 3rem;
+  border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 5;
+}
+
+.featureChip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.featureChip span {
+  font-size: 1rem;
+}
+
+/* ===== NAVBAR (Home Page) ===== */
+.navBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2rem;
+  background: var(--dark2);
+  border-bottom: 1px solid var(--border);
+}
+
+.navBar h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6c63ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== MEET CONTAINER (Home Page) ===== */
+.meetContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6vw;
+  padding: 3rem 4rem;
+  min-height: calc(100vh - 70px);
+  background: linear-gradient(135deg, #0d0d1a 0%, #12122a 100%);
+}
+
+.leftPanel {
+  display: flex;
+  align-items: center;
+  max-width: 480px;
+}
+
+.leftPanel h2 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2rem;
+  line-height: 1.3;
+}
+
+.leftPanel h2 span {
+  background: linear-gradient(90deg, #6c63ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.rightPanel {
+  display: flex;
+  align-items: center;
+}
+
+.rightPanel img {
+  width: 28vw;
+  max-width: 420px;
+  height: auto;
+  border-radius: 20px;
+  filter: drop-shadow(0 20px 60px rgba(108, 99, 255, 0.25));
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .landingPageContainer nav {
+    padding: 1rem 1.5rem;
+  }
+
+  .navHeader h2 {
+    font-size: 1.5rem;
+  }
+
+  .landingMainContainer {
+    flex-direction: column;
+    padding: 3rem 2rem;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .connect h1 {
+    font-size: 2.2rem;
+  }
+
+  .connect div[role="button"] {
+    margin: 0 auto;
+  }
+
+  .landingMainContainer div:nth-child(2) img {
+    height: 35vh;
+  }
+
+  .featuresStrip {
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+
+  .meetContainer {
+    flex-direction: column;
+    padding: 2rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .rightPanel img {
+    width: 70vw;
+  }
+}
