@@ -73,12 +73,27 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const handleLogout = async () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        await client.post("/logout", { token });
+      } catch {
+        /* ignore logout network errors */
+      }
+    }
+    localStorage.removeItem("token");
+    router("/");
+  };
+
   const data = {
     addToUserHistory,
     getHistoryOfUser,
     handleRegister,
     handleLogin,
+    handleLogout,
   };
 
   return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };
+

@@ -127,4 +127,28 @@ const addToHistory = async (req, res) => {
   }
 };
 
-export { login, register, getUserHistory, addToHistory };
+const logout = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token || typeof token !== "string") {
+    return res
+      .status(httpStatus.BAD_REQUEST)
+      .json({ message: "Token is required for logout" });
+  }
+
+  try {
+    const user = await User.findOne({ token: token });
+    if (user) {
+      user.token = "";
+      await user.save();
+    }
+    return res.status(httpStatus.OK).json({ message: "Logged out successfully" });
+  } catch (e) {
+    return res
+      .status(httpStatus.INTERNAL_SERVER_ERROR)
+      .json({ message: `Something went wrong: ${e.message || e}` });
+  }
+};
+
+export { login, register, getUserHistory, addToHistory, logout };
+

@@ -18,7 +18,7 @@ function HomeComponent(props) {
   const [mode, setMode] = useState(0); // 0 = Create, 1 = Join
   const [meetingCode, setMeetingCode] = useState("");
   const [snackbarMsg, setSnackbarMsg] = useState("");
-  const { addToUserHistory } = useContext(AuthContext);
+  const { addToUserHistory, handleLogout } = useContext(AuthContext);
 
   const generateRandomCode = () => {
     const randomStr = Math.random().toString(36).substring(2, 8);
@@ -77,10 +77,7 @@ function HomeComponent(props) {
               </IconButton>
               <span style={{ color: "#8888aa", fontSize: "0.85rem" }}>History</span>
               <Button
-                onClick={() => {
-                  localStorage.removeItem("token");
-                  navigate("/");
-                }}
+                onClick={handleLogout}
                 startIcon={<LogoutIcon />}
                 style={{
                   color: "#8888aa",
