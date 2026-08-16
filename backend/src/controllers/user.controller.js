@@ -114,12 +114,18 @@ const addToHistory = async (req, res) => {
         .json({ message: "Unauthorized: Invalid or expired token" });
     }
 
-    const newMeeting = new Meeting({
+    const existingMeeting = await Meeting.findOne({
       user_id: user.username,
       meetingCode: meeting_code,
     });
 
-    await newMeeting.save();
+    if (!existingMeeting) {
+      const newMeeting = new Meeting({
+        user_id: user.username,
+        meetingCode: meeting_code,
+      });
+      await newMeeting.save();
+    }
 
     res.status(httpStatus.CREATED).json({ message: "Added code to history" });
   } catch (e) {

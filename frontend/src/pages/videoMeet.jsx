@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, memo } from "react";
+import React, { useEffect, useRef, useState, useCallback, memo, useContext } from "react";
 import io from "socket.io-client";
 import { Badge, IconButton, TextField, Snackbar } from "@mui/material";
 import { Button } from "@mui/material";
@@ -14,6 +14,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import SendIcon from "@mui/icons-material/Send";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import server from "../environment";
+import { AuthContext } from "../contexts/AuthContext";
 
 const server_url = server;
 var connections = {};
@@ -166,6 +167,7 @@ export default function VideoMeetComponent() {
   let [callEnded, setCallEnded] = useState(false);
   let [copyToast, setCopyToast] = useState(false);
 
+  const { addToUserHistory } = useContext(AuthContext);
   const roomCode = window.location.pathname.replace(/^\//, "");
 
   const handleCopyLink = () => {
@@ -179,6 +181,10 @@ export default function VideoMeetComponent() {
 
   useEffect(() => {
     getPermissions();
+
+    if (roomCode && addToUserHistory) {
+      addToUserHistory(roomCode).catch(() => {});
+    }
 
     return () => {
       try {
