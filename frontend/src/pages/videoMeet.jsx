@@ -168,7 +168,7 @@ export default function VideoMeetComponent() {
   let [copyToast, setCopyToast] = useState(false);
 
   const { addToUserHistory } = useContext(AuthContext);
-  const roomCode = window.location.pathname.replace(/^\//, "");
+  const roomCode = window.location.pathname.replace(/^\/+|\/+$/g, "").split("?")[0];
 
   const handleCopyLink = () => {
     try {

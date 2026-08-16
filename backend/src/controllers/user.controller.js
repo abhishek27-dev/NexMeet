@@ -13,8 +13,10 @@ const login = async (req, res) => {
       .json({ message: "Please provide username and password" });
   }
 
+  const cleanUsername = username.trim().toLowerCase();
+
   try {
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username: cleanUsername });
     if (!user) {
       return res
         .status(httpStatus.NOT_FOUND)
@@ -48,8 +50,10 @@ const register = async (req, res) => {
       .json({ message: "Please provide name, username, and password" });
   }
 
+  const cleanUsername = username.trim().toLowerCase();
+
   try {
-    const existingUser = await User.findOne({ username });
+    const existingUser = await User.findOne({ username: cleanUsername });
     if (existingUser) {
       return res
         .status(httpStatus.CONFLICT)
@@ -59,8 +63,8 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = new User({
-      name: name,
-      username: username,
+      name: name.trim(),
+      username: cleanUsername,
       password: hashedPassword,
     });
 
@@ -90,7 +94,7 @@ const getUserHistory = async (req, res) => {
         .status(httpStatus.UNAUTHORIZED)
         .json({ message: "Unauthorized: Invalid or expired token" });
     }
-    const meetings = await Meeting.find({ user_id: user.username });
+    const meetings = await Meeting.find({ user_id: user.username }).sort({ date: -1 });
     res.json(meetings);
   } catch (e) {
     res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong: ${e.message || e}` });
@@ -106,6 +110,8 @@ const addToHistory = async (req, res) => {
       .json({ message: "Unauthorized: Token required" });
   }
 
+  const cleanCode = meeting_code.trim().replace(/^\/+|\/+$/g, "").split("?")[0];
+
   try {
     const user = await User.findOne({ token: token });
     if (!user) {
@@ -116,13 +122,16 @@ const addToHistory = async (req, res) => {
 
     const existingMeeting = await Meeting.findOne({
       user_id: user.username,
-      meetingCode: meeting_code,
+      meetingCode: cleanCode,
     });
 
-    if (!existingMeeting) {
+    if (existingMeeting) {
+      existingMeeting.date = Date.now();
+      await existingMeeting.save();
+    } else {
       const newMeeting = new Meeting({
         user_id: user.username,
-        meetingCode: meeting_code,
+        meetingCode: cleanCode,
       });
       await newMeeting.save();
     }
