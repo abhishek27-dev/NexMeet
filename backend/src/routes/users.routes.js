@@ -1,18 +1,57 @@
 import { Router } from "express";
 import {
-  addToHistory,
+  registerUserController,
+  loginUserController,
+  logoutUserController,
+  getMeController,
   getUserHistory,
-  login,
-  register,
-  logout,
+  addToHistory,
 } from "../controllers/user.controller.js";
+import authUser from "../middlewares/auth.middleware.js";
 
 const router = Router();
-router.route("/login").post(login);
-router.route("/register").post(register);
-router.route("/logout").post(logout);
-router.route("/add_to_activity").post(addToHistory);
-router.route("/get_all_activity").get(getUserHistory);
+
+/**
+ * @route POST /api/v1/users/register
+ * @description Register a new user
+ * @access Public
+ */
+router.post("/register", registerUserController);
+
+/**
+ * @route POST /api/v1/users/login
+ * @description Login user with username and password
+ * @access Public
+ */
+router.post("/login", loginUserController);
+
+/**
+ * @route GET & POST /api/v1/users/logout
+ * @description Clear token from cookie and add to blacklist
+ * @access Public
+ */
+router.get("/logout", logoutUserController);
+router.post("/logout", logoutUserController);
+
+/**
+ * @route GET /api/v1/users/get-me
+ * @description Get current logged in user details
+ * @access Private
+ */
+router.get("/get-me", authUser, getMeController);
+
+/**
+ * @route POST /api/v1/users/add_to_activity
+ * @description Add meeting to user history
+ * @access Private
+ */
+router.post("/add_to_activity", authUser, addToHistory);
+
+/**
+ * @route GET /api/v1/users/get_all_activity
+ * @description Get user's meeting history
+ * @access Private
+ */
+router.get("/get_all_activity", authUser, getUserHistory);
 
 export default router;
-

@@ -7,7 +7,7 @@ let timeOnline = {};
 export const connectToSocket = (server) => {
   const io = new Server(server, {
     cors: {
-      origin: "*",
+      origin: (origin, callback) => callback(null, true),
       methods: ["GET", "POST"],
       allowedHeaders: ["*"],
       credentials: true,
@@ -15,7 +15,7 @@ export const connectToSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("SOMETHING CONNECTED");
+    console.log(`Socket connected: ${socket.id}`);
 
     socket.on("join-call", (path) => {
       if (connections[path] === undefined) {
@@ -69,7 +69,6 @@ export const connectToSocket = (server) => {
           data: data,
           "socket-id-sender": socket.id,
         });
-        console.log("message", matchingRoom, ":", sender, data);
 
         connections[matchingRoom].forEach((elem) => {
           io.to(elem).emit("chat-message", data, sender, socket.id);
@@ -77,19 +76,15 @@ export const connectToSocket = (server) => {
       }
     });
 
-    // KEY FIX: explicit leave-call event — fires before socket.disconnect()
-    // so other users get notified immediately when someone clicks End Call
+    // Explicit leave-call event — fires immediately when user clicks End Call
     socket.on("leave-call", () => {
-      console.log("leave-call received from:", socket.id);
       for (const [roomKey, roomValue] of Object.entries(connections)) {
         if (roomValue.includes(socket.id)) {
-          // Notify all others in the room right away
           roomValue.forEach((peerId) => {
             if (peerId !== socket.id) {
               io.to(peerId).emit("user-left", socket.id);
             }
           });
-          // Remove from room
           connections[roomKey] = roomValue.filter((id) => id !== socket.id);
           if (connections[roomKey].length === 0) {
             delete connections[roomKey];
@@ -103,30 +98,21 @@ export const connectToSocket = (server) => {
     socket.on("disconnect", () => {
       delete timeOnline[socket.id];
 
-      var key;
-
-      for (const [k, v] of JSON.parse(
-        JSON.stringify(Object.entries(connections))
-      )) {
-        for (let a = 0; a < v.length; ++a) {
-          if (v[a] === socket.id) {
-            key = k;
-
-            for (let a = 0; a < connections[key].length; ++a) {
-              io.to(connections[key][a]).emit("user-left", socket.id);
+      for (const [roomKey, roomValue] of Object.entries(connections)) {
+        if (roomValue.includes(socket.id)) {
+          roomValue.forEach((peerId) => {
+            if (peerId !== socket.id) {
+              io.to(peerId).emit("user-left", socket.id);
             }
+          });
 
-            var index = connections[key].indexOf(socket.id);
-            if (index !== -1) {
-              connections[key].splice(index, 1);
-            }
+          connections[roomKey] = roomValue.filter((id) => id !== socket.id);
 
-            if (connections[key].length === 0) {
-              delete connections[key];
-              // BUG FIX: also cleanup messages for empty room
-              delete messages[key];
-            }
+          if (connections[roomKey].length === 0) {
+            delete connections[roomKey];
+            delete messages[roomKey];
           }
+          break;
         }
       }
     });

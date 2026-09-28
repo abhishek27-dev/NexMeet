@@ -1,127 +1,243 @@
-import httpStatus from "http-status";
-import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import { randomBytes } from "crypto";
+import jwt from "jsonwebtoken";
+import userModel from "../models/user.model.js";
+import tokenBlacklistModel from "../models/blacklist.model.js";
 import { Meeting } from "../models/meeting.model.js";
 
-const login = async (req, res) => {
-  const { username, password } = req.body;
+const JWT_SECRET = process.env.JWT_SECRET || "nexmeet_jwt_secret_key_secure_2026";
 
-  if (!username || !password) {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ message: "Please provide username and password" });
-  }
-
-  const cleanUsername = username.trim().toLowerCase();
-
-  try {
-    const user = await User.findOne({ username: cleanUsername });
-    if (!user) {
-      return res
-        .status(httpStatus.NOT_FOUND)
-        .json({ message: "User Not Found" });
-    }
-
-    let isPasswordCorrect = await bcrypt.compare(password, user.password);
-
-    if (isPasswordCorrect) {
-      let token = randomBytes(20).toString("hex");
-
-      user.token = token;
-      await user.save();
-      return res.status(httpStatus.OK).json({ token: token });
-    } else {
-      return res
-        .status(httpStatus.UNAUTHORIZED)
-        .json({ message: "Invalid Username or password" });
-    }
-  } catch (e) {
-    return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong: ${e.message || e}` });
-  }
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  maxAge: 24 * 60 * 60 * 1000,
 };
 
-const register = async (req, res) => {
+/**
+ * @name registerUserController
+ * @description register a new user, expects name, username and password in the request body
+ * @access Public
+ */
+async function registerUserController(req, res) {
   const { name, username, password } = req.body;
 
   if (!name || !username || !password) {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ message: "Please provide name, username, and password" });
+    return res.status(400).json({
+      message: "Please provide name, username and password",
+    });
   }
 
   const cleanUsername = username.trim().toLowerCase();
 
   try {
-    const existingUser = await User.findOne({ username: cleanUsername });
-    if (existingUser) {
-      return res
-        .status(httpStatus.CONFLICT)
-        .json({ message: "User already exists" });
+    const isUserAlreadyExists = await userModel.findOne({ username: cleanUsername });
+
+    if (isUserAlreadyExists) {
+      return res.status(400).json({
+        message: "Account already exists with this username",
+      });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hash = await bcrypt.hash(password, 10);
 
-    const newUser = new User({
+    const user = await userModel.create({
       name: name.trim(),
       username: cleanUsername,
-      password: hashedPassword,
+      password: hash,
     });
 
-    await newUser.save();
+    const token = jwt.sign(
+      { id: user._id, username: user.username, name: user.name },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
 
-    res
-      .status(httpStatus.CREATED)
-      .json({ message: "User Registered Successfully", newUser });
+    res.cookie("token", token, cookieOptions);
+
+    return res.status(201).json({
+      message: "User registered successfully",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+      },
+    });
   } catch (e) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong: ${e.message || e}` });
+    return res.status(500).json({
+      message: `Something went wrong: ${e.message || e}`,
+    });
   }
-};
+}
 
-const getUserHistory = async (req, res) => {
-  const { token } = req.query;
+/**
+ * @name loginUserController
+ * @description login a user, expects username and password in the request body
+ * @access Public
+ */
+async function loginUserController(req, res) {
+  const { username, password } = req.body;
 
-  if (!token || typeof token !== "string") {
-    return res
-      .status(httpStatus.UNAUTHORIZED)
-      .json({ message: "Unauthorized: Token required" });
+  if (!username || !password) {
+    return res.status(400).json({
+      message: "Please provide username and password",
+    });
+  }
+
+  const cleanUsername = username.trim().toLowerCase();
+
+  try {
+    const user = await userModel.findOne({ username: cleanUsername });
+
+    if (!user) {
+      return res.status(400).json({
+        message: "Invalid username or password",
+      });
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return res.status(400).json({
+        message: "Invalid username or password",
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, username: user.username, name: user.name },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    res.cookie("token", token, cookieOptions);
+
+    return res.status(200).json({
+      message: "User loggedIn successfully.",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({
+      message: `Something went wrong: ${e.message || e}`,
+    });
+  }
+}
+
+/**
+ * @name logoutUserController
+ * @description clear token from user cookie and add the token in blacklist
+ * @access Public
+ */
+async function logoutUserController(req, res) {
+  let token = req.cookies?.token;
+  if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
+    token = req.body?.token || req.query?.token;
   }
 
   try {
-    const user = await User.findOne({ token: token });
-    if (!user) {
-      return res
-        .status(httpStatus.UNAUTHORIZED)
-        .json({ message: "Unauthorized: Invalid or expired token" });
+    if (token) {
+      await tokenBlacklistModel.findOneAndUpdate(
+        { token },
+        { token },
+        { upsert: true, new: true }
+      );
     }
-    const meetings = await Meeting.find({ user_id: user.username }).sort({ date: -1 });
-    res.json(meetings);
+
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    });
+
+    return res.status(200).json({
+      message: "User logged out successfully",
+    });
   } catch (e) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong: ${e.message || e}` });
+    return res.status(500).json({
+      message: `Something went wrong: ${e.message || e}`,
+    });
   }
-};
+}
 
-const addToHistory = async (req, res) => {
-  const { token, meeting_code } = req.body;
+/**
+ * @name getMeController
+ * @description get the current logged in user details
+ * @access Private
+ */
+async function getMeController(req, res) {
+  try {
+    const user = await userModel.findById(req.user.id).select("-password");
 
-  if (!token || typeof token !== "string") {
-    return res
-      .status(httpStatus.UNAUTHORIZED)
-      .json({ message: "Unauthorized: Token required" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "User details fetched successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+      },
+    });
+  } catch (e) {
+    return res.status(500).json({
+      message: `Something went wrong: ${e.message || e}`,
+    });
+  }
+}
+
+/**
+ * @name getUserHistory
+ * @description get user's past meetings
+ * @access Private
+ */
+async function getUserHistory(req, res) {
+  try {
+    const username = req.user?.username;
+
+    if (!username) {
+      return res.status(401).json({ message: "Unauthorized: User not authenticated" });
+    }
+
+    const meetings = await Meeting.find({ user_id: username }).sort({ date: -1 });
+    return res.status(200).json(meetings);
+  } catch (e) {
+    return res.status(500).json({
+      message: `Something went wrong: ${e.message || e}`,
+    });
+  }
+}
+
+/**
+ * @name addToHistory
+ * @description record a meeting in user's history
+ * @access Private
+ */
+async function addToHistory(req, res) {
+  const { meeting_code } = req.body;
+
+  if (!meeting_code || typeof meeting_code !== "string") {
+    return res.status(400).json({ message: "Meeting code is required" });
+  }
+
+  const username = req.user?.username;
+  if (!username) {
+    return res.status(401).json({ message: "Unauthorized: User not authenticated" });
   }
 
   const cleanCode = meeting_code.trim().replace(/^\/+|\/+$/g, "").split("?")[0];
 
   try {
-    const user = await User.findOne({ token: token });
-    if (!user) {
-      return res
-        .status(httpStatus.UNAUTHORIZED)
-        .json({ message: "Unauthorized: Invalid or expired token" });
-    }
-
     const existingMeeting = await Meeting.findOne({
-      user_id: user.username,
+      user_id: username,
       meetingCode: cleanCode,
     });
 
@@ -129,41 +245,28 @@ const addToHistory = async (req, res) => {
       existingMeeting.date = Date.now();
       await existingMeeting.save();
     } else {
-      const newMeeting = new Meeting({
-        user_id: user.username,
+      await Meeting.create({
+        user_id: username,
         meetingCode: cleanCode,
       });
-      await newMeeting.save();
     }
 
-    res.status(httpStatus.CREATED).json({ message: "Added code to history" });
+    return res.status(201).json({ message: "Added code to history" });
   } catch (e) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({ message: `Something went wrong: ${e.message || e}` });
+    return res.status(500).json({
+      message: `Something went wrong: ${e.message || e}`,
+    });
   }
+}
+
+export {
+  registerUserController,
+  registerUserController as register,
+  loginUserController,
+  loginUserController as login,
+  logoutUserController,
+  logoutUserController as logout,
+  getMeController,
+  getUserHistory,
+  addToHistory,
 };
-
-const logout = async (req, res) => {
-  const { token } = req.body;
-
-  if (!token || typeof token !== "string") {
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ message: "Token is required for logout" });
-  }
-
-  try {
-    const user = await User.findOne({ token: token });
-    if (user) {
-      user.token = "";
-      await user.save();
-    }
-    return res.status(httpStatus.OK).json({ message: "Logged out successfully" });
-  } catch (e) {
-    return res
-      .status(httpStatus.INTERNAL_SERVER_ERROR)
-      .json({ message: `Something went wrong: ${e.message || e}` });
-  }
-};
-
-export { login, register, getUserHistory, addToHistory, logout };
-

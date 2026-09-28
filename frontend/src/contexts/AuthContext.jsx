@@ -9,6 +9,16 @@ export const AuthContext = createContext({});
 
 const client = axios.create({
   baseURL: `${server}/api/v1/users`,
+  withCredentials: true,
+});
+
+// Auto attach Authorization header for production cross-origin safety
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const AuthProvider = ({ children }) => {
@@ -21,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         username: username,
         password: password,
       });
-      if (request.status === httpStatus.CREATED) {
+      if (request.status === httpStatus.CREATED || request.status === 201) {
         return request.data.message;
       }
     } catch (err) {
@@ -36,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         password: password,
       });
 
-      if (request.status === httpStatus.OK) {
+      if (request.status === httpStatus.OK || request.status === 200) {
         localStorage.setItem("token", request.data.token);
         router("/home");
       }
@@ -96,4 +106,3 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };
-
