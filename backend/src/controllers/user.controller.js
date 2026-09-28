@@ -242,17 +242,27 @@ async function addToHistory(req, res) {
       meetingCode: cleanCode,
     });
 
+    let meeting;
+
     if (existingMeeting) {
       existingMeeting.date = Date.now();
-      await existingMeeting.save();
+      meeting = await existingMeeting.save();
     } else {
-      await Meeting.create({
+      meeting = await Meeting.create({
         user_id: username,
         meetingCode: cleanCode,
       });
     }
 
-    return res.status(201).json({ message: "Added code to history" });
+    return res.status(201).json({
+      message: "Added code to history",
+      meeting: {
+        id: meeting._id,
+        user_id: meeting.user_id,
+        meetingCode: meeting.meetingCode,
+        date: meeting.date,
+      },
+    });
   } catch (e) {
     return res.status(500).json({
       message: `Something went wrong: ${e.message || e}`,
