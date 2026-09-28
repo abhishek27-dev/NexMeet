@@ -10,3 +10,5 @@ frontend/dist/
 .DS_Store
 *.pdf
 NexMeet_Placement_Guide.pdf
+NexMeet_Interview_Guide.md
+generate_guide_pdf.py
