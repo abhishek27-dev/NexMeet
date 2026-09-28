@@ -141,17 +141,10 @@ async function logoutUserController(req, res) {
   if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
     token = req.headers.authorization.split(" ")[1];
   }
-  if (!token) {
-    token = req.body?.token || req.query?.token;
-  }
 
   try {
     if (token) {
-      await tokenBlacklistModel.findOneAndUpdate(
-        { token },
-        { token },
-        { upsert: true, new: true }
-      );
+      await tokenBlacklistModel.create({ token });
     }
 
     res.clearCookie("token", {

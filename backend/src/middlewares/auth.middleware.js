@@ -3,17 +3,12 @@ const tokenBlacklistModel = require("../models/blacklist.model");
 
 /**
  * @name authUser
- * @description Verifies JWT from cookie, Authorization header, query or body, and checks against blacklistTokens
+ * @description Verifies JWT from cookie or Authorization header, and checks against blacklistTokens
  */
 async function authUser(req, res, next) {
   let token = req.cookies?.token;
   if (!token && req.headers.authorization && req.headers.authorization.startsWith("Bearer ")) {
     token = req.headers.authorization.split(" ")[1];
-  }
-
-  // Fallback for query params or request body
-  if (!token) {
-    token = req.body?.token || req.query?.token;
   }
 
   if (!token) {
