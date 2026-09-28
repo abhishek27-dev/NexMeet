@@ -50,7 +50,7 @@ async function registerUserController(req, res) {
     });
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, email: user.email },
+      { id: user._id, username: user.username },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -108,7 +108,7 @@ async function loginUserController(req, res) {
     }
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, email: user.email },
+      { id: user._id, username: user.username },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
