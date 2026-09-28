@@ -28,10 +28,7 @@ async function authUser(req, res, next) {
   }
 
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || "nexmeet_jwt_secret_key_secure_2026"
-    );
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     req.user = decoded;
 

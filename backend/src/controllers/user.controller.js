@@ -4,7 +4,7 @@ const userModel = require("../models/user.model");
 const tokenBlacklistModel = require("../models/blacklist.model");
 const { Meeting } = require("../models/meeting.model");
 
-const JWT_SECRET = process.env.JWT_SECRET || "nexmeet_jwt_secret_key_secure_2026";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 const cookieOptions = {
   httpOnly: true,
