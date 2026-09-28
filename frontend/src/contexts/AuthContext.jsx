@@ -24,11 +24,11 @@ client.interceptors.request.use((config) => {
 export const AuthProvider = ({ children }) => {
   const router = useNavigate();
 
-  const handleRegister = async (name, username, password) => {
+  const handleRegister = async (username, email, password) => {
     try {
       let request = await client.post("/register", {
-        name: name,
         username: username,
+        email: email,
         password: password,
       });
       if (request.status === httpStatus.CREATED || request.status === 201) {
@@ -39,10 +39,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const handleLogin = async (username, password) => {
+  const handleLogin = async (usernameOrEmail, password) => {
     try {
       let request = await client.post("/login", {
-        username: username,
+        username: usernameOrEmail,
+        email: usernameOrEmail,
         password: password,
       });
 

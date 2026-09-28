@@ -5,8 +5,8 @@ import VideoCallIcon from "@mui/icons-material/VideoCall";
 
 export default function Authentication() {
   const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [name, setName] = React.useState("");
   const [error, setError] = React.useState("");
   const [message, setMessage] = React.useState("");
   const [formState, setFormState] = React.useState(0); // 0=login, 1=register
@@ -18,11 +18,11 @@ export default function Authentication() {
   let handleAuth = async () => {
     setError("");
     if (formState === 0 && (!username.trim() || !password.trim())) {
-      setError("Please fill in both username and password");
+      setError("Please fill in both username/email and password");
       return;
     }
-    if (formState === 1 && (!name.trim() || !username.trim() || !password.trim())) {
-      setError("Please fill in all fields (Full Name, Username, Password)");
+    if (formState === 1 && (!username.trim() || !email.trim() || !password.trim())) {
+      setError("Please fill in all fields (Username, Email, Password)");
       return;
     }
 
@@ -31,11 +31,11 @@ export default function Authentication() {
       if (formState === 0) {
         await handleLogin(username.trim(), password.trim());
       } else {
-        let result = await handleRegister(name.trim(), username.trim(), password.trim());
+        let result = await handleRegister(username.trim(), email.trim(), password.trim());
         setMessage(result || "Registration successful! Please sign in.");
         setOpen(true);
-        setName("");
         setUsername("");
+        setEmail("");
         setPassword("");
         setFormState(0);
       }
@@ -146,22 +146,23 @@ export default function Authentication() {
 
         {/* Form */}
         <div>
-          {formState === 1 && (
-            <input
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              style={inputStyle}
-              onKeyDown={(e) => e.key === "Enter" && handleAuth()}
-            />
-          )}
           <input
-            placeholder="Username"
+            placeholder={formState === 0 ? "Username or Email" : "Username"}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             style={inputStyle}
             onKeyDown={(e) => e.key === "Enter" && handleAuth()}
           />
+          {formState === 1 && (
+            <input
+              placeholder="Email Address"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={inputStyle}
+              onKeyDown={(e) => e.key === "Enter" && handleAuth()}
+            />
+          )}
           <input
             placeholder="Password"
             type="password"
@@ -182,25 +183,26 @@ export default function Authentication() {
             onClick={handleAuth}
             disabled={loading}
             style={{
-              width: "100%", padding: "13px",
+              width: "100%", padding: "14px",
               background: loading
                 ? "rgba(108,99,255,0.5)"
                 : "linear-gradient(135deg, #6c63ff, #00d4aa)",
-              border: "none", borderRadius: "10px", color: "white",
-              fontFamily: "Inter, sans-serif", fontWeight: 600,
-              fontSize: "1rem", cursor: loading ? "not-allowed" : "pointer",
-              boxShadow: "0 8px 25px rgba(108,99,255,0.3)",
-              transition: "opacity 0.2s, transform 0.2s",
+              border: "none", borderRadius: "10px",
+              color: "white", fontWeight: 700, fontSize: "1rem",
+              cursor: loading ? "not-allowed" : "pointer",
+              fontFamily: "Inter, sans-serif",
+              marginTop: "4px",
+              transition: "opacity 0.2s, transform 0.1s",
             }}
           >
-            {loading ? "Please wait..." : formState === 0 ? "Sign In" : "Create Account"}
+            {loading ? "Processing..." : formState === 0 ? "Sign In" : "Create Account"}
           </button>
         </div>
       </div>
 
       <Snackbar
         open={open}
-        autoHideDuration={3000}
+        autoHideDuration={4000}
         onClose={() => setOpen(false)}
         message={message}
       />

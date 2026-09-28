@@ -15,39 +15,42 @@ const cookieOptions = {
 
 /**
  * @name registerUserController
- * @description register a new user, expects name, username and password in the request body
+ * @description register a new user, expects username, email and password in the request body
  * @access Public
  */
 async function registerUserController(req, res) {
-  const { name, username, password } = req.body;
+  const { username, email, password } = req.body;
 
-  if (!name || !username || !password) {
+  if (!username || !email || !password) {
     return res.status(400).json({
-      message: "Please provide name, username and password",
+      message: "Please provide username, email and password",
     });
   }
 
   const cleanUsername = username.trim().toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
 
   try {
-    const isUserAlreadyExists = await userModel.findOne({ username: cleanUsername });
+    const isUserAlreadyExists = await userModel.findOne({
+      $or: [{ username: cleanUsername }, { email: cleanEmail }],
+    });
 
     if (isUserAlreadyExists) {
       return res.status(400).json({
-        message: "Account already exists with this username",
+        message: "Account already exists with this email address or username",
       });
     }
 
     const hash = await bcrypt.hash(password, 10);
 
     const user = await userModel.create({
-      name: name.trim(),
       username: cleanUsername,
+      email: cleanEmail,
       password: hash,
     });
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, name: user.name },
+      { id: user._id, username: user.username, email: user.email },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -59,8 +62,8 @@ async function registerUserController(req, res) {
       token,
       user: {
         id: user._id,
-        name: user.name,
         username: user.username,
+        email: user.email,
       },
     });
   } catch (e) {
@@ -72,26 +75,27 @@ async function registerUserController(req, res) {
 
 /**
  * @name loginUserController
- * @description login a user, expects username and password in the request body
+ * @description login a user, expects email or username and password in the request body
  * @access Public
  */
 async function loginUserController(req, res) {
-  const { username, password } = req.body;
+  const { email, username, password } = req.body;
+  const identifier = (email || username || "").trim().toLowerCase();
 
-  if (!username || !password) {
+  if (!identifier || !password) {
     return res.status(400).json({
-      message: "Please provide username and password",
+      message: "Please provide email/username and password",
     });
   }
 
-  const cleanUsername = username.trim().toLowerCase();
-
   try {
-    const user = await userModel.findOne({ username: cleanUsername });
+    const user = await userModel.findOne({
+      $or: [{ email: identifier }, { username: identifier }],
+    });
 
     if (!user) {
       return res.status(400).json({
-        message: "Invalid username or password",
+        message: "Invalid email/username or password",
       });
     }
 
@@ -99,12 +103,12 @@ async function loginUserController(req, res) {
 
     if (!isPasswordValid) {
       return res.status(400).json({
-        message: "Invalid username or password",
+        message: "Invalid email/username or password",
       });
     }
 
     const token = jwt.sign(
-      { id: user._id, username: user.username, name: user.name },
+      { id: user._id, username: user.username, email: user.email },
       JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -116,8 +120,8 @@ async function loginUserController(req, res) {
       token,
       user: {
         id: user._id,
-        name: user.name,
         username: user.username,
+        email: user.email,
       },
     });
   } catch (e) {
@@ -183,8 +187,8 @@ async function getMeController(req, res) {
       message: "User details fetched successfully",
       user: {
         id: user._id,
-        name: user.name,
         username: user.username,
+        email: user.email,
       },
     });
   } catch (e) {
