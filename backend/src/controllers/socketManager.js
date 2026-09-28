@@ -1,10 +1,10 @@
-import { Server } from "socket.io";
+const { Server } = require("socket.io");
 
 let connections = {};
 let messages = {};
 let timeOnline = {};
 
-export const connectToSocket = (server) => {
+const connectToSocket = (server) => {
   const io = new Server(server, {
     cors: {
       origin: (origin, callback) => callback(null, true),
@@ -120,3 +120,5 @@ export const connectToSocket = (server) => {
 
   return io;
 };
+
+module.exports = { connectToSocket };

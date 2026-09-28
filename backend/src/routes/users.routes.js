@@ -1,13 +1,13 @@
-import { Router } from "express";
-import {
+const { Router } = require("express");
+const {
   registerUserController,
   loginUserController,
   logoutUserController,
   getMeController,
   getUserHistory,
   addToHistory,
-} from "../controllers/user.controller.js";
-import authUser from "../middlewares/auth.middleware.js";
+} = require("../controllers/user.controller");
+const { authUser } = require("../middlewares/auth.middleware");
 
 const router = Router();
 
@@ -54,4 +54,4 @@ router.post("/add_to_activity", authUser, addToHistory);
  */
 router.get("/get_all_activity", authUser, getUserHistory);
 
-export default router;
+module.exports = router;

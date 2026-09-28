@@ -1,8 +1,8 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import userModel from "../models/user.model.js";
-import tokenBlacklistModel from "../models/blacklist.model.js";
-import { Meeting } from "../models/meeting.model.js";
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const userModel = require("../models/user.model");
+const tokenBlacklistModel = require("../models/blacklist.model");
+const { Meeting } = require("../models/meeting.model");
 
 const JWT_SECRET = process.env.JWT_SECRET || "nexmeet_jwt_secret_key_secure_2026";
 
@@ -259,13 +259,10 @@ async function addToHistory(req, res) {
   }
 }
 
-export {
+module.exports = {
   registerUserController,
-  registerUserController as register,
   loginUserController,
-  loginUserController as login,
   logoutUserController,
-  logoutUserController as logout,
   getMeController,
   getUserHistory,
   addToHistory,

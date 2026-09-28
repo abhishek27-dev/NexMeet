@@ -1,10 +1,8 @@
-import { createServer } from "node:http";
-import dotenv from "dotenv";
-import { app } from "./src/app.js";
-import { connectToSocket } from "./src/controllers/socketManager.js";
-import connectDB from "./src/config/db.js";
-
-dotenv.config();
+const { createServer } = require("node:http");
+require("dotenv").config();
+const { app } = require("./src/app");
+const { connectToSocket } = require("./src/controllers/socketManager");
+const connectDB = require("./src/config/db");
 
 const PORT = process.env.PORT || 8000;
 const server = createServer(app);
@@ -18,4 +16,3 @@ const startServer = async () => {
 };
 
 startServer();
-

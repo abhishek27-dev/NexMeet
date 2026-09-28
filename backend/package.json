@@ -7,7 +7,6 @@
     "start": "node server.js",
     "prod": "pm2 server.js"
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
   "description": "",

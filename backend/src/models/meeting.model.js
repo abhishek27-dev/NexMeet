@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const meetingSchema = new Schema({
   user_id: { type: String },
@@ -7,4 +8,5 @@ const meetingSchema = new Schema({
 });
 
 const Meeting = mongoose.model("Meeting", meetingSchema);
-export { Meeting };
+
+module.exports = { Meeting };

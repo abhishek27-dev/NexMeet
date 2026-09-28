@@ -1,7 +1,7 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import userRoutes from "./routes/users.routes.js";
+const express = require("express");
+const cors = require("cors");
+const cookieParser = require("cookie-parser");
+const userRoutes = require("./routes/users.routes");
 
 const app = express();
 
@@ -31,6 +31,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(cookieParser());
 app.use(express.json({ limit: "40kb" }));
 app.use(express.urlencoded({ limit: "40kb", extended: true }));
@@ -55,4 +56,4 @@ app.use((err, req, res, next) => {
   });
 });
 
-export { app };
+module.exports = { app };

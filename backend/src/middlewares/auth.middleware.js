@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken";
-import tokenBlacklistModel from "../models/blacklist.model.js";
+const jwt = require("jsonwebtoken");
+const tokenBlacklistModel = require("../models/blacklist.model");
 
 /**
  * @name authUser
@@ -49,5 +49,4 @@ async function authUser(req, res, next) {
   }
 }
 
-export { authUser, authUser as verifyJWT };
-export default authUser;
+module.exports = { authUser };
