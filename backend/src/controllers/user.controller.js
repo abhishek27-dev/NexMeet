@@ -142,10 +142,14 @@ async function logoutUserController(req, res) {
     token = req.headers.authorization.split(" ")[1];
   }
 
+  if (!token) {
+    return res.status(400).json({
+      message: "No active session or token found to logout",
+    });
+  }
+
   try {
-    if (token) {
-      await tokenBlacklistModel.create({ token });
-    }
+    await tokenBlacklistModel.create({ token });
 
     res.clearCookie("token", {
       httpOnly: true,
@@ -263,4 +267,4 @@ module.exports = {
   getMeController,
   getUserHistory,
   addToHistory,
-};
+}
