@@ -26,11 +26,10 @@ router.post("/register", registerUserController);
 router.post("/login", loginUserController);
 
 /**
- * @route GET & POST /api/v1/users/logout
+ * @route POST /api/v1/users/logout
  * @description Clear token from cookie and add to blacklist
  * @access Public
  */
-router.get("/logout", logoutUserController);
 router.post("/logout", logoutUserController);
 
 /**
