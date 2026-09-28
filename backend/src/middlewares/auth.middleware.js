@@ -34,7 +34,6 @@ async function authUser(req, res, next) {
     );
 
     req.user = decoded;
-    req.token = token;
 
     next();
   } catch (err) {
