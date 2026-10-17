@@ -180,6 +180,24 @@ export default function VideoMeetComponent() {
   };
 
   useEffect(() => {
+    // Clear any stale connections from previous sessions
+    for (let id in connections) {
+      try { connections[id].close(); delete connections[id]; } catch { /* ignore */ }
+    }
+
+    // Prefill username if user is logged in
+    try {
+      const storedUser = localStorage.getItem("user");
+      if (storedUser) {
+        const parsed = JSON.parse(storedUser);
+        if (parsed?.username) {
+          setUsername(parsed.username);
+        }
+      }
+    } catch {
+      /* ignore storage parse */
+    }
+
     getPermissions();
 
     if (roomCode && addToUserHistory) {
@@ -206,31 +224,44 @@ export default function VideoMeetComponent() {
   }, []);
 
   const getPermissions = async () => {
+    let hasVideo = false;
+    let hasAudio = false;
+
     try {
       const videoPermission = await navigator.mediaDevices.getUserMedia({ video: true });
-      setVideoAvailable(!!videoPermission);
-      // BUG FIX: stop the temporary permission-check stream so camera light doesn't stay on
+      hasVideo = !!videoPermission;
       videoPermission.getTracks().forEach((track) => track.stop());
-
-      const audioPermission = await navigator.mediaDevices.getUserMedia({ audio: true });
-      setAudioAvailable(!!audioPermission);
-      // BUG FIX: stop the temporary permission-check stream
-      audioPermission.getTracks().forEach((track) => track.stop());
-
-      setScreenAvailable(!!navigator.mediaDevices.getDisplayMedia);
-
-      const userMediaStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-      if (userMediaStream) {
-        window.localStream = userMediaStream;
-        if (localVideoref.current) {
-          localVideoref.current.srcObject = userMediaStream;
-        }
-      }
     } catch {
-      // Camera/mic permission denied or unavailable — app still works without them
+      hasVideo = false;
+    }
+
+    try {
+      const audioPermission = await navigator.mediaDevices.getUserMedia({ audio: true });
+      hasAudio = !!audioPermission;
+      audioPermission.getTracks().forEach((track) => track.stop());
+    } catch {
+      hasAudio = false;
+    }
+
+    setVideoAvailable(hasVideo);
+    setAudioAvailable(hasAudio);
+    setScreenAvailable(Boolean(navigator.mediaDevices?.getDisplayMedia));
+
+    if (hasVideo || hasAudio) {
+      try {
+        const userMediaStream = await navigator.mediaDevices.getUserMedia({
+          video: hasVideo,
+          audio: hasAudio,
+        });
+        if (userMediaStream) {
+          window.localStream = userMediaStream;
+          if (localVideoref.current) {
+            localVideoref.current.srcObject = userMediaStream;
+          }
+        }
+      } catch (err) {
+        console.warn("Could not acquire media stream:", err);
+      }
     }
   };
 
@@ -378,7 +409,7 @@ export default function VideoMeetComponent() {
     socketRef.current.on("signal", gotMessageFromServer);
 
     socketRef.current.on("connect", () => {
-      socketRef.current.emit("join-call", window.location.href);
+      socketRef.current.emit("join-call", roomCode);
       socketIdRef.current = socketRef.current.id;
 
       socketRef.current.on("chat-message", addMessage);
@@ -386,7 +417,7 @@ export default function VideoMeetComponent() {
       socketRef.current.on("user-left", (id) => {
         // Close the peer connection
         if (connections[id]) {
-          connections[id].close();
+          try { connections[id].close(); } catch { /* ignore */ }
           delete connections[id];
         }
 
@@ -395,22 +426,9 @@ export default function VideoMeetComponent() {
         videoRef.current = updated;
         setVideos(updated);
 
-        if (updated.length === 0) {
-          // KEY FIX: no other participants left -> end MY call automatically too
-          setCallEnded(true);
-          setTimeout(() => {
-            try {
-              let tracks = localVideoref.current?.srcObject?.getTracks();
-              tracks?.forEach((track) => track.stop());
-            } catch { /* ignore */ }
-            if (socketRef.current) socketRef.current.disconnect();
-            window.location.href = "/home";
-          }, 2500);
-        } else {
-          // Others still in the call -> just show a banner
-          setPeerLeft(true);
-          setTimeout(() => setPeerLeft(false), 4000);
-        }
+        // Show banner that a participant left, user stays in room until they click End Call
+        setPeerLeft(true);
+        setTimeout(() => setPeerLeft(false), 5000);
       });
 
       socketRef.current.on("user-joined", (id, clients) => {

@@ -34,6 +34,9 @@ export const AuthProvider = ({ children }) => {
       if (request.status === httpStatus.CREATED || request.status === 201) {
         if (request.data.token) {
           localStorage.setItem("token", request.data.token);
+          if (request.data.user) {
+            localStorage.setItem("user", JSON.stringify(request.data.user));
+          }
           router("/home");
         }
         return request.data.message;
@@ -53,6 +56,9 @@ export const AuthProvider = ({ children }) => {
 
       if (request.status === httpStatus.OK || request.status === 200) {
         localStorage.setItem("token", request.data.token);
+        if (request.data.user) {
+          localStorage.setItem("user", JSON.stringify(request.data.user));
+        }
         router("/home");
       }
     } catch (err) {
@@ -98,6 +104,7 @@ export const AuthProvider = ({ children }) => {
       }
     }
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     router("/");
   };
 

@@ -18,27 +18,37 @@ const connectToSocket = (server) => {
     console.log(`Socket connected: ${socket.id}`);
 
     socket.on("join-call", (path) => {
-      if (connections[path] === undefined) {
-        connections[path] = [];
+      // Normalize room code to ensure clients with full URL, relative path, or query params join the same room
+      const cleanPath = String(path || "")
+        .trim()
+        .replace(/^https?:\/\/[^\/]+/, "")
+        .replace(/^\/+|\/+$/g, "")
+        .split("?")[0];
+      const room = cleanPath || "default";
+
+      if (connections[room] === undefined) {
+        connections[room] = [];
       }
-      connections[path].push(socket.id);
+      if (!connections[room].includes(socket.id)) {
+        connections[room].push(socket.id);
+      }
       timeOnline[socket.id] = new Date();
 
-      for (let a = 0; a < connections[path].length; a++) {
-        io.to(connections[path][a]).emit(
+      for (let a = 0; a < connections[room].length; a++) {
+        io.to(connections[room][a]).emit(
           "user-joined",
           socket.id,
-          connections[path]
+          connections[room]
         );
       }
 
-      if (messages[path] !== undefined) {
-        for (let a = 0; a < messages[path].length; ++a) {
+      if (messages[room] !== undefined) {
+        for (let a = 0; a < messages[room].length; ++a) {
           io.to(socket.id).emit(
             "chat-message",
-            messages[path][a]["data"],
-            messages[path][a]["sender"],
-            messages[path][a]["socket-id-sender"]
+            messages[room][a]["data"],
+            messages[room][a]["sender"],
+            messages[room][a]["socket-id-sender"]
           );
         }
       }
