@@ -61,7 +61,7 @@ function HomeComponent(props) {
     <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0d0d1a 0%, #12122a 100%)" }}>
       {/* Navbar */}
       <div className="navBar">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }} onClick={() => navigate("/")}>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <img src="/favicon.png" alt="NexMeet logo" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
           <h2 style={{ margin: 0 }}>NexMeet</h2>
         </div>
