@@ -164,7 +164,6 @@ export default function VideoMeetComponent() {
   let [username, setUsername] = useState("");
   let [videos, setVideos] = useState([]);
   let [peerLeft, setPeerLeft] = useState(false);
-  let [callEnded, setCallEnded] = useState(false);
   let [copyToast, setCopyToast] = useState(false);
 
   const { addToUserHistory } = useContext(AuthContext);
@@ -204,13 +203,15 @@ export default function VideoMeetComponent() {
       addToUserHistory(roomCode).catch(() => {});
     }
 
+    const currentVideoEl = localVideoref.current;
+
     return () => {
       try {
         let tracks = window.localStream?.getTracks();
         tracks?.forEach((t) => t.stop());
       } catch { /* ignore */ }
       try {
-        let tracks = localVideoref.current?.srcObject?.getTracks();
+        let tracks = currentVideoEl?.srcObject?.getTracks();
         tracks?.forEach((t) => t.stop());
       } catch { /* ignore */ }
       for (let id in connections) {
@@ -221,6 +222,7 @@ export default function VideoMeetComponent() {
         socketRef.current.disconnect();
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getPermissions = async () => {
@@ -708,43 +710,6 @@ export default function VideoMeetComponent() {
               Copy Link
             </Button>
           </div>
-
-          {/* KEY FIX: Call Ended overlay — auto-redirect when alone */}
-          {callEnded && (
-            <div style={{
-              position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-              background: "rgba(13,13,26,0.97)",
-              display: "flex", flexDirection: "column",
-              alignItems: "center", justifyContent: "center",
-              gap: "14px", zIndex: 200, fontFamily: "Inter, sans-serif",
-              color: "white", textAlign: "center",
-            }}>
-              <h2 style={{
-                fontFamily: "Space Grotesk, sans-serif", fontSize: "1.9rem", fontWeight: 700,
-                background: "linear-gradient(90deg, #6c63ff, #00d4aa)",
-                WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-              }}>
-                Call Ended
-              </h2>
-              <p style={{ color: "#8888aa", fontSize: "0.95rem" }}>
-                The other participant has left the meeting.
-              </p>
-              <p style={{ color: "#666688", fontSize: "0.8rem" }}>
-                Redirecting to home...
-              </p>
-              <Button
-                variant="contained"
-                onClick={() => { window.location.href = "/home"; }}
-                sx={{
-                  background: "linear-gradient(135deg, #6c63ff, #00d4aa)",
-                  borderRadius: "10px", padding: "8px 28px",
-                  textTransform: "none", fontWeight: 600, marginTop: "8px",
-                }}
-              >
-                Go to Home Now
-              </Button>
-            </div>
-          )}
 
           {/* FIX 2: ChatPanel is memoized — video tiles won't flicker */}
           {showModal && (
