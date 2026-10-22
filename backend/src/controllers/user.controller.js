@@ -202,15 +202,13 @@ async function getMeController(req, res) {
  */
 async function getUserHistory(req, res) {
   try {
-    const username = req.user?.username;
+    const userId = req.user?.id;
 
-    if (!username) {
+    if (!userId) {
       return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    const meetings = await Meeting.find({
-      $or: [{ username }, { user_id: username }],
-    }).sort({ date: -1 });
+    const meetings = await Meeting.find({ user_id: userId }).sort({ date: -1 });
     return res.status(200).json(meetings);
   } catch (e) {
     return res.status(500).json({
@@ -231,8 +229,8 @@ async function addToHistory(req, res) {
     return res.status(400).json({ message: "Meeting code is required" });
   }
 
-  const username = req.user?.username;
-  if (!username) {
+  const userId = req.user?.id;
+  if (!userId) {
     return res.status(401).json({ message: "Unauthorized: User not authenticated" });
   }
 
@@ -240,7 +238,7 @@ async function addToHistory(req, res) {
 
   try {
     const existingMeeting = await Meeting.findOne({
-      $or: [{ username }, { user_id: username }],
+      user_id: userId,
       meetingCode: cleanCode,
     });
 
@@ -251,7 +249,7 @@ async function addToHistory(req, res) {
       meeting = await existingMeeting.save();
     } else {
       meeting = await Meeting.create({
-        username,
+        user_id: userId,
         meetingCode: cleanCode,
       });
     }
@@ -260,7 +258,7 @@ async function addToHistory(req, res) {
       message: "Added code to history",
       meeting: {
         id: meeting._id,
-        username: meeting.username || username,
+        user_id: meeting.user_id,
         meetingCode: meeting.meetingCode,
         date: meeting.date,
       },
