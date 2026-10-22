@@ -208,7 +208,9 @@ async function getUserHistory(req, res) {
       return res.status(401).json({ message: "Unauthorized: User not authenticated" });
     }
 
-    const meetings = await Meeting.find({ user_id: username }).sort({ date: -1 });
+    const meetings = await Meeting.find({
+      $or: [{ username }, { user_id: username }],
+    }).sort({ date: -1 });
     return res.status(200).json(meetings);
   } catch (e) {
     return res.status(500).json({
@@ -238,7 +240,7 @@ async function addToHistory(req, res) {
 
   try {
     const existingMeeting = await Meeting.findOne({
-      user_id: username,
+      $or: [{ username }, { user_id: username }],
       meetingCode: cleanCode,
     });
 
@@ -249,7 +251,7 @@ async function addToHistory(req, res) {
       meeting = await existingMeeting.save();
     } else {
       meeting = await Meeting.create({
-        user_id: username,
+        username,
         meetingCode: cleanCode,
       });
     }
@@ -258,7 +260,7 @@ async function addToHistory(req, res) {
       message: "Added code to history",
       meeting: {
         id: meeting._id,
-        user_id: meeting.user_id,
+        username: meeting.username || username,
         meetingCode: meeting.meetingCode,
         date: meeting.date,
       },
