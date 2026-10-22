@@ -1,9 +1,9 @@
 import React from "react";
-import "../App.css";
+import "../../../App.css";
 import { Link, useNavigate } from "react-router-dom";
 
-export default function LandingPage() {
-  const router = useNavigate();
+export default function Landing() {
+  const navigate = useNavigate();
 
   return (
     <div className="landingPageContainer">
@@ -12,9 +12,9 @@ export default function LandingPage() {
           <h2>NexMeet</h2>
         </div>
         <div className="navlist">
-          <p onClick={() => router("/home")}>Join as Guest</p>
-          <p onClick={() => router("/auth")}>Register</p>
-          <div onClick={() => router("/auth")} role="button">
+          <p onClick={() => navigate("/home")}>Join as Guest</p>
+          <p onClick={() => navigate("/auth")}>Register</p>
+          <div onClick={() => navigate("/auth")} role="button">
             <p>Login</p>
           </div>
         </div>
@@ -41,7 +41,11 @@ export default function LandingPage() {
           </div>
         </div>
         <div>
-          <img src="/nexmeet_hero.png" alt="NexMeet high-tech video conference" className="heroImg" />
+          <img
+            src="/nexmeet_hero.png"
+            alt="NexMeet high-tech video conference"
+            className="heroImg"
+          />
         </div>
       </div>
 

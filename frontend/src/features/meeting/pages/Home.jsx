@@ -1,7 +1,8 @@
-import React, { useContext, useState } from "react";
-import withAuth from "../utils/withAuth";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../App.css";
+import { useAuth } from "../../auth/hooks/useAuth";
+import { addToHistory } from "../services/meeting.api";
+import "../../../App.css";
 import { Button, IconButton, TextField, Snackbar } from "@mui/material";
 import RestoreIcon from "@mui/icons-material/Restore";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
@@ -10,15 +11,13 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import LoginIcon from "@mui/icons-material/Login";
-import { AuthContext } from "../contexts/AuthContext";
 
-function HomeComponent(props) {
-  let navigate = useNavigate();
-  const isAuth = props.isAuthenticated || Boolean(localStorage.getItem("token"));
+export default function Home() {
+  const navigate = useNavigate();
+  const { isAuthenticated, handleLogout } = useAuth();
   const [mode, setMode] = useState(0); // 0 = Create, 1 = Join
   const [meetingCode, setMeetingCode] = useState("");
   const [snackbarMsg, setSnackbarMsg] = useState("");
-  const { addToUserHistory, handleLogout } = useContext(AuthContext);
 
   const generateRandomCode = () => {
     const randomStr = Math.random().toString(36).substring(2, 8);
@@ -49,7 +48,7 @@ function HomeComponent(props) {
     }
 
     try {
-      await addToUserHistory(code);
+      await addToHistory(code);
     } catch {
       /* ignore history error */
     }
@@ -62,11 +61,15 @@ function HomeComponent(props) {
       {/* Navbar */}
       <div className="navBar">
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img src="/favicon.png" alt="NexMeet logo" style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }} />
+          <img
+            src="/favicon.png"
+            alt="NexMeet logo"
+            style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }}
+          />
           <h2 style={{ margin: 0 }}>NexMeet</h2>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {isAuth ? (
+          {isAuthenticated ? (
             <>
               <IconButton
                 onClick={() => navigate("/history")}
@@ -91,15 +94,17 @@ function HomeComponent(props) {
             </>
           ) : (
             <>
-              <span style={{
-                background: "rgba(108,99,255,0.15)",
-                border: "1px solid rgba(108,99,255,0.3)",
-                color: "#00d4aa",
-                padding: "4px 10px",
-                borderRadius: "20px",
-                fontSize: "0.78rem",
-                fontWeight: 600,
-              }}>
+              <span
+                style={{
+                  background: "rgba(108,99,255,0.15)",
+                  border: "1px solid rgba(108,99,255,0.3)",
+                  color: "#00d4aa",
+                  padding: "4px 10px",
+                  borderRadius: "20px",
+                  fontSize: "0.78rem",
+                  fontWeight: 600,
+                }}
+              >
                 👤 Guest Mode
               </span>
               <Button
@@ -136,18 +141,32 @@ function HomeComponent(props) {
             </h2>
 
             {/* Mode Selector Tabs */}
-            <div style={{
-              display: "flex", background: "rgba(255,255,255,0.05)",
-              borderRadius: "12px", padding: "4px", marginBottom: "1.5rem",
-              border: "1px solid rgba(108,99,255,0.2)",
-            }}>
+            <div
+              style={{
+                display: "flex",
+                background: "rgba(255,255,255,0.05)",
+                borderRadius: "12px",
+                padding: "4px",
+                marginBottom: "1.5rem",
+                border: "1px solid rgba(108,99,255,0.2)",
+              }}
+            >
               <button
                 onClick={() => { setMode(0); setMeetingCode(""); }}
                 style={{
-                  flex: 1, padding: "10px", border: "none", borderRadius: "10px",
-                  cursor: "pointer", fontFamily: "Inter, sans-serif",
-                  fontWeight: 600, fontSize: "0.9rem", transition: "all 0.2s",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                  flex: 1,
+                  padding: "10px",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
                   background: mode === 0 ? "linear-gradient(135deg, #6c63ff, #00d4aa)" : "transparent",
                   color: mode === 0 ? "white" : "#8888aa",
                 }}
@@ -159,10 +178,19 @@ function HomeComponent(props) {
               <button
                 onClick={() => { setMode(1); setMeetingCode(""); }}
                 style={{
-                  flex: 1, padding: "10px", border: "none", borderRadius: "10px",
-                  cursor: "pointer", fontFamily: "Inter, sans-serif",
-                  fontWeight: 600, fontSize: "0.9rem", transition: "all 0.2s",
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
+                  flex: 1,
+                  padding: "10px",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  fontFamily: "Inter, sans-serif",
+                  fontWeight: 600,
+                  fontSize: "0.9rem",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "6px",
                   background: mode === 1 ? "linear-gradient(135deg, #6c63ff, #00d4aa)" : "transparent",
                   color: mode === 1 ? "white" : "#8888aa",
                 }}
@@ -173,13 +201,15 @@ function HomeComponent(props) {
             </div>
 
             {/* Action Box */}
-            <div style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(108,99,255,0.2)",
-              borderRadius: "16px",
-              padding: "1.5rem",
-              backdropFilter: "blur(10px)",
-            }}>
+            <div
+              style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(108,99,255,0.2)",
+                borderRadius: "16px",
+                padding: "1.5rem",
+                backdropFilter: "blur(10px)",
+              }}
+            >
               {mode === 0 ? (
                 /* Create Room Mode */
                 <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -311,6 +341,3 @@ function HomeComponent(props) {
     </div>
   );
 }
-
-const AuthenticatedHome = withAuth(HomeComponent);
-export default AuthenticatedHome;
