@@ -8,11 +8,9 @@ const PORT = process.env.PORT || 8000;
 const server = createServer(app);
 const io = connectToSocket(server);
 
-const startServer = async () => {
-  await connectDB();
-  server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-  });
-};
+connectDB();
 
-startServer();
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
