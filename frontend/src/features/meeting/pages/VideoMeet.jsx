@@ -522,10 +522,10 @@ export default function VideoMeet() {
       socketRef.current.emit("leave-call");
       setTimeout(() => {
         socketRef.current.disconnect();
-        window.location.href = "/home";
+        window.location.href = "/";
       }, 300);
     } else {
-      window.location.href = "/home";
+      window.location.href = "/";
     }
   };
 

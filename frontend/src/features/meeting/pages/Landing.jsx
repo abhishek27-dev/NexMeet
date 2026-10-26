@@ -12,9 +12,8 @@ export default function Landing() {
           <h2>NexMeet</h2>
         </div>
         <div className="navlist">
-          <p onClick={() => navigate("/home")}>Join as Guest</p>
-          <p onClick={() => navigate("/auth")}>Register</p>
-          <div onClick={() => navigate("/auth")} role="button">
+          <p onClick={() => navigate("/register")}>Register</p>
+          <div onClick={() => navigate("/login")} role="button">
             <p>Login</p>
           </div>
         </div>
@@ -34,7 +33,7 @@ export default function Landing() {
           <div role="button">
             <Link
               style={{ color: "white", textDecoration: "none", fontSize: "1rem" }}
-              to="/auth"
+              to="/register"
             >
               Get Started Free →
             </Link>

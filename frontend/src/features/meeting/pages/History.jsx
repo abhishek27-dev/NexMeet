@@ -54,7 +54,7 @@ export default function History() {
           borderBottom: "1px solid rgba(108,99,255,0.2)",
         }}
       >
-        <IconButton onClick={() => navigate("/home")} style={{ color: "#6c63ff" }}>
+        <IconButton onClick={() => navigate("/")} style={{ color: "#6c63ff" }}>
           <HomeIcon />
         </IconButton>
         <h2

@@ -10,11 +10,10 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
-import LoginIcon from "@mui/icons-material/Login";
 
 export default function Home() {
   const navigate = useNavigate();
-  const { isAuthenticated, handleLogout } = useAuth();
+  const { user, handleLogout } = useAuth();
   const [mode, setMode] = useState(0); // 0 = Create, 1 = Join
   const [meetingCode, setMeetingCode] = useState("");
   const [snackbarMsg, setSnackbarMsg] = useState("");
@@ -68,63 +67,42 @@ export default function Home() {
           />
           <h2 style={{ margin: 0 }}>NexMeet</h2>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {isAuthenticated ? (
-            <>
-              <IconButton
-                onClick={() => navigate("/history")}
-                style={{ color: "#8888aa" }}
-                title="Meeting History"
-              >
-                <RestoreIcon />
-              </IconButton>
-              <span style={{ color: "#8888aa", fontSize: "0.85rem" }}>History</span>
-              <Button
-                onClick={handleLogout}
-                startIcon={<LogoutIcon />}
-                style={{
-                  color: "#8888aa",
-                  marginLeft: "12px",
-                  textTransform: "none",
-                  fontSize: "0.9rem",
-                }}
-              >
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <span
-                style={{
-                  background: "rgba(108,99,255,0.15)",
-                  border: "1px solid rgba(108,99,255,0.3)",
-                  color: "#00d4aa",
-                  padding: "4px 10px",
-                  borderRadius: "20px",
-                  fontSize: "0.78rem",
-                  fontWeight: 600,
-                }}
-              >
-                👤 Guest Mode
-              </span>
-              <Button
-                onClick={() => navigate("/auth")}
-                startIcon={<LoginIcon />}
-                sx={{
-                  background: "linear-gradient(135deg, #6c63ff, #00d4aa)",
-                  color: "white",
-                  borderRadius: "8px",
-                  padding: "6px 16px",
-                  textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: "0.85rem",
-                  marginLeft: "8px",
-                }}
-              >
-                Sign In
-              </Button>
-            </>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          {user?.username && (
+            <span
+              style={{
+                color: "#e2e8f0",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                background: "rgba(108, 99, 255, 0.2)",
+                padding: "4px 12px",
+                borderRadius: "20px",
+                border: "1px solid rgba(108, 99, 255, 0.3)",
+              }}
+            >
+              👋 {user.username}
+            </span>
           )}
+          <IconButton
+            onClick={() => navigate("/history")}
+            style={{ color: "#8888aa" }}
+            title="Meeting History"
+          >
+            <RestoreIcon />
+          </IconButton>
+          <span style={{ color: "#8888aa", fontSize: "0.85rem" }}>History</span>
+          <Button
+            onClick={handleLogout}
+            startIcon={<LogoutIcon />}
+            style={{
+              color: "#8888aa",
+              marginLeft: "12px",
+              textTransform: "none",
+              fontSize: "0.9rem",
+            }}
+          >
+            Logout
+          </Button>
         </div>
       </div>
 
