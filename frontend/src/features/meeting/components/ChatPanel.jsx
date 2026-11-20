@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, memo } from "react";
-import { TextField, IconButton } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import styles from "../../../styles/videoComponent.module.css";
+import "../pages/VideoMeet.css";
 
 export const ChatPanel = memo(({ messages, message, onMessageChange, onSend }) => {
   const displayRef = useRef();
@@ -13,81 +12,40 @@ export const ChatPanel = memo(({ messages, message, onMessageChange, onSend }) =
   }, [messages]);
 
   return (
-    <div className={styles.chatRoom}>
-      <div className={styles.chatContainer}>
-        <h1>Chat</h1>
-        <div className={styles.chattingDisplay} ref={displayRef}>
+    <div className="chat-room">
+      <div className="chat-container">
+        <h1 className="chat-header">Chat</h1>
+
+        <div className="chat-display" ref={displayRef}>
           {messages.length === 0 ? (
-            <p
-              style={{
-                color: "#8888aa",
-                fontSize: "0.85rem",
-                textAlign: "center",
-                marginTop: "1rem",
-              }}
-            >
-              No messages yet
-            </p>
+            <p className="chat-empty-msg">No messages yet</p>
           ) : (
             messages.map((item, index) => (
-              <div key={index} style={{ marginBottom: "12px", marginLeft: "8px" }}>
-                <p
-                  style={{
-                    fontWeight: 600,
-                    fontSize: "0.82rem",
-                    color: "#6c63ff",
-                    marginBottom: "2px",
-                  }}
-                >
-                  {item.sender}
-                </p>
-                <p
-                  style={{
-                    fontSize: "0.9rem",
-                    color: "#e8e8f0",
-                    wordBreak: "break-word",
-                  }}
-                >
-                  {item.data}
-                </p>
+              <div key={index} className="chat-message-row">
+                <p className="chat-sender">{item.sender}</p>
+                <p className="chat-msg-text">{item.data}</p>
               </div>
             ))
           )}
         </div>
-        <div className={styles.chattingArea}>
-          <TextField
+
+        <div className="chat-input-area">
+          <input
+            type="text"
+            className="chat-text-input"
             value={message}
             onChange={onMessageChange}
             onKeyDown={(e) => e.key === "Enter" && onSend()}
-            label="Type a message"
-            variant="outlined"
-            size="small"
-            fullWidth
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                color: "#ffffff",
-                borderRadius: "8px",
-                "& fieldset": { borderColor: "rgba(108,99,255,0.4)" },
-                "&:hover fieldset": { borderColor: "#6c63ff" },
-                "&.Mui-focused fieldset": { borderColor: "#6c63ff" },
-              },
-              "& .MuiInputLabel-root": { color: "#8888aa" },
-              "& .MuiInputLabel-root.Mui-focused": { color: "#6c63ff" },
-              "& .MuiInputBase-input": { color: "#ffffff" },
-            }}
+            placeholder="Type a message..."
           />
-          <IconButton
+          <button
+            type="button"
+            className="chat-send-btn"
             onClick={onSend}
-            sx={{
-              background: "linear-gradient(135deg, #6c63ff, #00d4aa)",
-              color: "white",
-              borderRadius: "8px",
-              padding: "8px",
-              "&:hover": { opacity: 0.85 },
-            }}
+            title="Send Message"
           >
-            <SendIcon fontSize="small" />
-          </IconButton>
+            <SendIcon style={{ fontSize: "20px" }} />
+          </button>
         </div>
       </div>
     </div>

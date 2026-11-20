@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import io from "socket.io-client";
-import { Badge, IconButton, TextField, Snackbar, Button } from "@mui/material";
+import { Badge, Snackbar } from "@mui/material";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import CallEndIcon from "@mui/icons-material/CallEnd";
@@ -11,7 +11,7 @@ import StopScreenShareIcon from "@mui/icons-material/StopScreenShare";
 import ChatIcon from "@mui/icons-material/Chat";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 
-import styles from "../../../styles/videoComponent.module.css";
+import "./VideoMeet.css";
 import { API_BASE_URL } from "../../../services/api.client";
 import { addToHistory } from "../services/meeting.api";
 import { VideoTile } from "../components/VideoTile";
@@ -556,130 +556,52 @@ export default function VideoMeet() {
   return (
     <div>
       {askForUsername ? (
-        <div
-          style={{
-            padding: "40px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "20px",
-            minHeight: "100vh",
-            background: "linear-gradient(135deg, #0d0d1a 0%, #12122a 100%)",
-            justifyContent: "center",
-          }}
-        >
-          <h2
-            style={{
-              fontFamily: "Space Grotesk, sans-serif",
-              fontSize: "2rem",
-              fontWeight: 700,
-              background: "linear-gradient(90deg, #6c63ff, #00d4aa)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Enter Lobby — NexMeet
-          </h2>
+        /* Phase 1: Lobby Screen */
+        <div className="lobby-screen">
+          <h2 className="lobby-title">Enter Lobby — NexMeet</h2>
 
-          <TextField
-            label="Your Name"
+          <input
+            type="text"
+            className="lobby-input"
+            placeholder="Your Name"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && connect()}
-            variant="outlined"
-            sx={{
-              width: "280px",
-              "& .MuiOutlinedInput-root": {
-                color: "#ffffff",
-                borderRadius: "10px",
-                "& fieldset": { borderColor: "rgba(108,99,255,0.4)" },
-                "&:hover fieldset": { borderColor: "#6c63ff" },
-                "&.Mui-focused fieldset": { borderColor: "#6c63ff" },
-              },
-              "& .MuiInputLabel-root": { color: "#8888aa" },
-              "& .MuiInputLabel-root.Mui-focused": { color: "#6c63ff" },
-              "& .MuiInputBase-input": { color: "#ffffff" },
-            }}
           />
 
-          <Button
-            variant="contained"
-            onClick={connect}
-            sx={{
-              background: "linear-gradient(135deg, #6c63ff, #00d4aa)",
-              borderRadius: "10px",
-              padding: "10px 32px",
-              textTransform: "none",
-              fontWeight: 600,
-              fontSize: "1rem",
-              boxShadow: "0 8px 25px rgba(108,99,255,0.35)",
-            }}
-          >
+          <button type="button" className="lobby-join-btn" onClick={connect}>
             Join Call
-          </Button>
+          </button>
 
           <video
-            style={{
-              borderRadius: "14px",
-              border: "2px solid rgba(108,99,255,0.4)",
-              maxWidth: "400px",
-              width: "100%",
-              marginTop: "8px",
-            }}
+            className="lobby-preview-video"
             ref={localVideoref}
             autoPlay
             muted
           />
         </div>
       ) : (
-        <div className={styles.meetVideoContainer}>
-          {/* Top Info Bar */}
-          <div
-            style={{
-              position: "absolute",
-              top: "16px",
-              left: "16px",
-              zIndex: 40,
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              background: "rgba(18, 18, 42, 0.75)",
-              backdropFilter: "blur(12px)",
-              border: "1px solid rgba(108, 99, 255, 0.3)",
-              borderRadius: "12px",
-              padding: "6px 14px",
-              color: "white",
-              fontFamily: "Inter, sans-serif",
-            }}
-          >
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <span style={{ fontSize: "0.72rem", color: "#8888aa" }}>Meeting Code</span>
-              <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "#00d4aa" }}>
-                {roomCode}
-              </span>
+        /* Phase 2: Active Meeting Room */
+        <div className="meet-video-container">
+          {/* Top Bar: Meeting Code & Copy Link */}
+          <div className="meet-top-bar">
+            <div className="meet-code-info">
+              <span className="meet-code-label">Meeting Code</span>
+              <span className="meet-code-val">{roomCode}</span>
             </div>
 
-            <Button
+            <button
+              type="button"
+              className="meet-copy-btn"
               onClick={handleCopyLink}
-              size="small"
-              startIcon={<ContentCopyIcon style={{ fontSize: "15px" }} />}
-              sx={{
-                background: "rgba(108, 99, 255, 0.25)",
-                color: "white",
-                borderRadius: "8px",
-                textTransform: "none",
-                fontSize: "0.78rem",
-                fontWeight: 600,
-                border: "1px solid rgba(108,99,255,0.4)",
-                "&:hover": { background: "linear-gradient(135deg, #6c63ff, #00d4aa)" },
-              }}
+              title="Copy invite link"
             >
+              <ContentCopyIcon style={{ fontSize: "14px" }} />
               Copy Link
-            </Button>
+            </button>
           </div>
 
-          {/* ChatPanel */}
+          {/* Chat Panel Component */}
           {showModal && (
             <ChatPanel
               messages={messages}
@@ -689,117 +611,84 @@ export default function VideoMeet() {
             />
           )}
 
-          {/* Control Buttons */}
-          <div className={styles.buttonContainers}>
-            <IconButton
+          {/* Bottom Meeting Controls Bar */}
+          <div className="meet-controls-bar">
+            <button
+              type="button"
+              className={`meet-control-btn ${video ? "active" : ""}`}
               onClick={handleVideo}
-              sx={{
-                background: video ? "rgba(108,99,255,0.2)" : "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: "50%",
-                width: 52,
-                height: 52,
-                color: video ? "#6c63ff" : "white",
-              }}
+              title={video ? "Turn camera off" : "Turn camera on"}
             >
               {video ? <VideocamIcon /> : <VideocamOffIcon />}
-            </IconButton>
+            </button>
 
-            <IconButton
+            <button
+              type="button"
+              className="meet-end-btn"
               onClick={handleEndCall}
-              sx={{
-                background: "#ff4444",
-                borderRadius: "50%",
-                width: 56,
-                height: 56,
-                color: "white",
-                "&:hover": { background: "#cc0000" },
-              }}
+              title="End call"
             >
               <CallEndIcon />
-            </IconButton>
+            </button>
 
-            <IconButton
+            <button
+              type="button"
+              className={`meet-control-btn ${audio ? "active" : ""}`}
               onClick={handleAudio}
-              sx={{
-                background: audio ? "rgba(108,99,255,0.2)" : "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: "50%",
-                width: 52,
-                height: 52,
-                color: audio ? "#6c63ff" : "white",
-              }}
+              title={audio ? "Mute mic" : "Unmute mic"}
             >
               {audio ? <MicIcon /> : <MicOffIcon />}
-            </IconButton>
+            </button>
 
             {screenAvailable && (
-              <IconButton
+              <button
+                type="button"
+                className={`meet-control-btn ${screen ? "screen-active" : ""}`}
                 onClick={handleScreen}
-                sx={{
-                  background: screen ? "rgba(0,212,170,0.2)" : "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: "50%",
-                  width: 52,
-                  height: 52,
-                  color: screen ? "#00d4aa" : "white",
-                }}
+                title={screen ? "Stop sharing" : "Share screen"}
               >
                 {screen ? <ScreenShareIcon /> : <StopScreenShareIcon />}
-              </IconButton>
+              </button>
             )}
 
             <Badge badgeContent={newMessages} color="error" max={99}>
-              <IconButton
+              <button
+                type="button"
+                className={`meet-control-btn ${showModal ? "active" : ""}`}
                 onClick={() => {
                   setModal(!showModal);
                   setNewMessages(0);
                 }}
-                sx={{
-                  background: showModal ? "rgba(108,99,255,0.2)" : "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  borderRadius: "50%",
-                  width: 52,
-                  height: 52,
-                  color: showModal ? "#6c63ff" : "white",
-                }}
+                title="Toggle chat"
               >
                 <ChatIcon />
-              </IconButton>
+              </button>
             </Badge>
           </div>
 
-          {/* Peer Left Banner */}
+          {/* Participant left notification */}
           {peerLeft && (
-            <div
-              style={{
-                position: "absolute",
-                top: "20px",
-                left: "50%",
-                transform: "translateX(-50%)",
-                background: "rgba(255, 68, 68, 0.9)",
-                color: "white",
-                padding: "10px 24px",
-                borderRadius: "10px",
-                fontFamily: "Inter, sans-serif",
-                fontWeight: 600,
-                fontSize: "0.95rem",
-                zIndex: 50,
-                boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
-                animation: "fadeIn 0.3s ease",
-              }}
-            >
+            <div className="meet-peer-left-banner">
               👤 A participant has left the call
             </div>
           )}
 
-          {/* Local Video */}
-          <video className={styles.meetUserVideo} ref={localVideoref} autoPlay muted />
+          {/* Local User Floating Video (PIP) */}
+          <video
+            className="meet-user-video"
+            ref={localVideoref}
+            autoPlay
+            muted
+          />
 
-          {/* Conference View with VideoTile */}
-          <div className={`${styles.conferenceView}`}>
+          {/* Conference Video Tiles */}
+          <div className="conference-grid">
             {videos.map((v) => (
-              <VideoTile key={v.socketId} socketId={v.socketId} stream={v.stream} />
+              <VideoTile
+                key={v.socketId}
+                socketId={v.socketId}
+                stream={v.stream}
+              />
             ))}
           </div>
         </div>

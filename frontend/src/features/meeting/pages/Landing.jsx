@@ -1,12 +1,13 @@
 import React from "react";
-import "../../../App.css";
 import { Link, useNavigate } from "react-router-dom";
+import "./Landing.css";
 
 export default function Landing() {
   const navigate = useNavigate();
 
   return (
     <div className="landingPageContainer">
+      {/* Navbar */}
       <nav>
         <div className="navHeader">
           <h2>NexMeet</h2>
@@ -19,6 +20,7 @@ export default function Landing() {
         </div>
       </nav>
 
+      {/* Hero section */}
       <div className="landingMainContainer">
         <div className="connect">
           <h1>
@@ -39,6 +41,7 @@ export default function Landing() {
             </Link>
           </div>
         </div>
+
         <div>
           <img
             src="/nexmeet_hero.png"
@@ -48,6 +51,7 @@ export default function Landing() {
         </div>
       </div>
 
+      {/* Feature Strip */}
       <div className="featuresStrip">
         <div className="featureChip"><span>🔒</span> End-to-End Secure</div>
         <div className="featureChip"><span>⚡</span> Ultra Low Latency</div>

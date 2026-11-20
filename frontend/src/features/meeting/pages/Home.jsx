@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";
 import { addToHistory } from "../services/meeting.api";
-import "../../../App.css";
-import { Button, IconButton, TextField, Snackbar } from "@mui/material";
+import { Snackbar } from "@mui/material";
 import RestoreIcon from "@mui/icons-material/Restore";
 import VideoCallIcon from "@mui/icons-material/VideoCall";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import "./Home.css";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -56,57 +56,40 @@ export default function Home() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(135deg, #0d0d1a 0%, #12122a 100%)" }}>
-      {/* Navbar */}
-      <div className="navBar">
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+    <div className="home-page">
+      {/* Top Navbar */}
+      <div className="home-nav">
+        <div className="home-nav-brand">
           <img
             src="/favicon.png"
             alt="NexMeet logo"
-            style={{ width: "32px", height: "32px", borderRadius: "8px", objectFit: "cover" }}
+            className="home-nav-logo"
           />
-          <h2 style={{ margin: 0 }}>NexMeet</h2>
+          <h2 className="home-nav-title">NexMeet</h2>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+
+        <div className="home-nav-actions">
           {user?.username && (
-            <span
-              style={{
-                color: "#e2e8f0",
-                fontSize: "0.85rem",
-                fontWeight: 600,
-                background: "rgba(108, 99, 255, 0.2)",
-                padding: "4px 12px",
-                borderRadius: "20px",
-                border: "1px solid rgba(108, 99, 255, 0.3)",
-              }}
-            >
-              👋 {user.username}
-            </span>
+            <span className="home-user-pill">👋 {user.username}</span>
           )}
-          <IconButton
+
+          <button
             onClick={() => navigate("/history")}
-            style={{ color: "#8888aa" }}
+            className="home-history-link"
             title="Meeting History"
           >
-            <RestoreIcon />
-          </IconButton>
-          <span style={{ color: "#8888aa", fontSize: "0.85rem" }}>History</span>
-          <Button
-            onClick={handleLogout}
-            startIcon={<LogoutIcon />}
-            style={{
-              color: "#8888aa",
-              marginLeft: "12px",
-              textTransform: "none",
-              fontSize: "0.9rem",
-            }}
-          >
-            Logout
-          </Button>
+            <RestoreIcon style={{ fontSize: "20px" }} />
+            <span>History</span>
+          </button>
+
+          <button onClick={handleLogout} className="home-logout-btn">
+            <LogoutIcon style={{ fontSize: "18px" }} />
+            <span>Logout</span>
+          </button>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Main Body Section */}
       <div className="meetContainer">
         <div className="leftPanel">
           <div style={{ width: "100%" }}>
@@ -119,184 +102,86 @@ export default function Home() {
             </h2>
 
             {/* Mode Selector Tabs */}
-            <div
-              style={{
-                display: "flex",
-                background: "rgba(255,255,255,0.05)",
-                borderRadius: "12px",
-                padding: "4px",
-                marginBottom: "1.5rem",
-                border: "1px solid rgba(108,99,255,0.2)",
-              }}
-            >
+            <div className="home-mode-tabs">
               <button
+                type="button"
+                className={`home-tab-btn ${mode === 0 ? "active" : ""}`}
                 onClick={() => { setMode(0); setMeetingCode(""); }}
-                style={{
-                  flex: 1,
-                  padding: "10px",
-                  border: "none",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  transition: "all 0.2s",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                  background: mode === 0 ? "linear-gradient(135deg, #6c63ff, #00d4aa)" : "transparent",
-                  color: mode === 0 ? "white" : "#8888aa",
-                }}
               >
                 <AddBoxIcon style={{ fontSize: "18px" }} />
                 Create Room
               </button>
 
               <button
+                type="button"
+                className={`home-tab-btn ${mode === 1 ? "active" : ""}`}
                 onClick={() => { setMode(1); setMeetingCode(""); }}
-                style={{
-                  flex: 1,
-                  padding: "10px",
-                  border: "none",
-                  borderRadius: "10px",
-                  cursor: "pointer",
-                  fontFamily: "Inter, sans-serif",
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  transition: "all 0.2s",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                  background: mode === 1 ? "linear-gradient(135deg, #6c63ff, #00d4aa)" : "transparent",
-                  color: mode === 1 ? "white" : "#8888aa",
-                }}
               >
                 <MeetingRoomIcon style={{ fontSize: "18px" }} />
                 Join Room
               </button>
             </div>
 
-            {/* Action Box */}
-            <div
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(108,99,255,0.2)",
-                borderRadius: "16px",
-                padding: "1.5rem",
-                backdropFilter: "blur(10px)",
-              }}
-            >
+            {/* Mode Action Card */}
+            <div className="home-action-card">
               {mode === 0 ? (
                 /* Create Room Mode */
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  <div style={{ display: "flex", gap: "10px" }}>
-                    <TextField
-                      onChange={(e) => setMeetingCode(e.target.value)}
+                <div className="home-form-body">
+                  <div className="home-input-row">
+                    <input
+                      type="text"
+                      className="home-text-input"
+                      placeholder="Enter custom code or generate one"
                       value={meetingCode}
-                      label="Enter Custom Code or Generate One"
-                      variant="outlined"
-                      fullWidth
+                      onChange={(e) => setMeetingCode(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleStartCall()}
-                      sx={{
-                        "& .MuiOutlinedInput-root": {
-                          color: "white",
-                          borderRadius: "10px",
-                          "& fieldset": { borderColor: "rgba(108,99,255,0.4)" },
-                          "&:hover fieldset": { borderColor: "#6c63ff" },
-                          "&.Mui-focused fieldset": { borderColor: "#6c63ff" },
-                        },
-                        "& .MuiInputLabel-root": { color: "#8888aa" },
-                        "& .MuiInputLabel-root.Mui-focused": { color: "#6c63ff" },
-                      }}
                     />
-                    <Button
+                    <button
+                      type="button"
+                      className="home-random-code-btn"
                       onClick={generateRandomCode}
-                      variant="outlined"
                       title="Generate Instant Code"
-                      startIcon={<AutoAwesomeIcon />}
-                      sx={{
-                        borderColor: "rgba(0,212,170,0.5)",
-                        color: "#00d4aa",
-                        borderRadius: "10px",
-                        textTransform: "none",
-                        fontWeight: 600,
-                        whiteSpace: "nowrap",
-                        "&:hover": {
-                          borderColor: "#00d4aa",
-                          background: "rgba(0,212,170,0.1)",
-                        },
-                      }}
                     >
+                      <AutoAwesomeIcon style={{ fontSize: "18px" }} />
                       Random Code
-                    </Button>
+                    </button>
                   </div>
 
-                  <Button
+                  <button
+                    type="button"
+                    className="home-primary-btn"
                     onClick={handleStartCall}
-                    variant="contained"
-                    startIcon={<VideoCallIcon />}
-                    sx={{
-                      background: "linear-gradient(135deg, #6c63ff, #00d4aa)",
-                      borderRadius: "10px",
-                      padding: "13px",
-                      textTransform: "none",
-                      fontWeight: 600,
-                      fontSize: "1rem",
-                      boxShadow: "0 8px 25px rgba(108,99,255,0.35)",
-                      "&:hover": { opacity: 0.9 },
-                    }}
                   >
+                    <VideoCallIcon />
                     Start & Create Room
-                  </Button>
+                  </button>
 
-                  <p style={{ color: "#8888aa", fontSize: "0.82rem", lineHeight: "1.4", margin: 0 }}>
+                  <p className="home-tip">
                     💡 Creating a room generates a shareable link that you can easily copy and send to your team.
                   </p>
                 </div>
               ) : (
                 /* Join Room Mode */
-                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-                  <TextField
-                    onChange={(e) => setMeetingCode(e.target.value)}
+                <div className="home-form-body">
+                  <input
+                    type="text"
+                    className="home-text-input"
+                    placeholder="Enter Meeting Code or Invite Link"
                     value={meetingCode}
-                    label="Enter Meeting Code or Invite Link"
-                    variant="outlined"
-                    fullWidth
+                    onChange={(e) => setMeetingCode(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleStartCall()}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        color: "white",
-                        borderRadius: "10px",
-                        "& fieldset": { borderColor: "rgba(108,99,255,0.4)" },
-                        "&:hover fieldset": { borderColor: "#6c63ff" },
-                        "&.Mui-focused fieldset": { borderColor: "#6c63ff" },
-                      },
-                      "& .MuiInputLabel-root": { color: "#8888aa" },
-                      "& .MuiInputLabel-root.Mui-focused": { color: "#6c63ff" },
-                    }}
                   />
 
-                  <Button
+                  <button
+                    type="button"
+                    className="home-primary-btn"
                     onClick={handleStartCall}
-                    variant="contained"
-                    startIcon={<MeetingRoomIcon />}
-                    sx={{
-                      background: "linear-gradient(135deg, #6c63ff, #00d4aa)",
-                      borderRadius: "10px",
-                      padding: "13px",
-                      textTransform: "none",
-                      fontWeight: 600,
-                      fontSize: "1rem",
-                      boxShadow: "0 8px 25px rgba(108,99,255,0.35)",
-                      "&:hover": { opacity: 0.9 },
-                    }}
                   >
+                    <MeetingRoomIcon />
                     Join Room Now
-                  </Button>
+                  </button>
 
-                  <p style={{ color: "#8888aa", fontSize: "0.82rem", lineHeight: "1.4", margin: 0 }}>
+                  <p className="home-tip">
                     🔗 Paste the code (e.g. <code>nex-8a2f1c</code>) or full URL provided by the host.
                   </p>
                 </div>

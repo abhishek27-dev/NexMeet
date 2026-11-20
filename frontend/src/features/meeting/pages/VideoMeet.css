@@ -1,0 +1,480 @@
+/* ===== VIDEO MEET, LOBBY, TILES & CHAT ===== */
+
+/* ===== LOBBY PREVIEW SCREEN ===== */
+.lobby-screen {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #12122a 100%);
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  color: white;
+}
+
+.lobby-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #6c63ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+}
+
+.lobby-input {
+  width: 280px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(108, 99, 255, 0.4);
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-family: "Inter", sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.lobby-input:focus {
+  border-color: #6c63ff;
+}
+
+.lobby-join-btn {
+  background: linear-gradient(135deg, #6c63ff, #00d4aa);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 32px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  font-family: "Inter", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(108, 99, 255, 0.35);
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.lobby-join-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.lobby-preview-video {
+  border-radius: 14px;
+  border: 2px solid rgba(108, 99, 255, 0.4);
+  max-width: 400px;
+  width: 100%;
+  margin-top: 8px;
+  background: #12122a;
+}
+
+/* ===== MAIN CALL ROOM CONTAINER ===== */
+.meet-video-container {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  background: #080814;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+  font-family: "Inter", sans-serif;
+}
+
+/* Local User Video (PIP Floating Window) */
+.meet-user-video {
+  position: absolute;
+  bottom: 90px;
+  left: 16px;
+  width: 160px;
+  height: auto;
+  border-radius: 14px;
+  z-index: 10;
+  border: 2px solid rgba(108, 99, 255, 0.5);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+  background: #12122a;
+}
+
+/* Top Bar: Room Code & Copy Link */
+.meet-top-bar {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(18, 18, 42, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  border-radius: 12px;
+  padding: 6px 14px;
+  color: white;
+}
+
+.meet-code-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.meet-code-label {
+  font-size: 0.72rem;
+  color: #8888aa;
+}
+
+.meet-code-val {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #00d4aa;
+}
+
+.meet-copy-btn {
+  background: rgba(108, 99, 255, 0.25);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+  border: 1px solid rgba(108, 99, 255, 0.4);
+  padding: 6px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.meet-copy-btn:hover {
+  background: linear-gradient(135deg, #6c63ff, #00d4aa);
+}
+
+/* Control Buttons at Bottom */
+.meet-controls-bar {
+  position: absolute;
+  bottom: 16px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 20;
+}
+
+.meet-control-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  backdrop-filter: blur(10px);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.meet-control-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.meet-control-btn.active {
+  background: rgba(108, 99, 255, 0.2);
+  border-color: rgba(108, 99, 255, 0.4);
+  color: #6c63ff;
+}
+
+.meet-control-btn.screen-active {
+  background: rgba(0, 212, 170, 0.2);
+  border-color: rgba(0, 212, 170, 0.4);
+  color: #00d4aa;
+}
+
+.meet-end-btn {
+  background: #ff4444;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.meet-end-btn:hover {
+  background: #cc0000;
+}
+
+/* Peer left alert banner */
+.meet-peer-left-banner {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 68, 68, 0.9);
+  color: white;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  z-index: 50;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  animation: fadeIn 0.3s ease;
+}
+
+/* Conference Grid & Tiles */
+.conference-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+  align-content: center;
+  margin-bottom: 70px;
+}
+
+.video-tile {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  background: #12122a;
+  position: relative;
+}
+
+.video-tile video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  min-width: 200px;
+  min-height: 150px;
+  max-width: 420px;
+  aspect-ratio: 16 / 9;
+}
+
+.video-tile-placeholder {
+  width: 100%;
+  height: 100%;
+  min-width: 200px;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #12122a, #1a1a35);
+  color: #8888aa;
+  font-family: "Inter", sans-serif;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.video-tile-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6c63ff, #00d4aa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 6px;
+}
+
+.video-tile-label {
+  font-size: 0.8rem;
+  color: #e8e8f0;
+}
+
+/* ===== CHAT PANEL ===== */
+.chat-room {
+  position: absolute;
+  bottom: 80px;
+  right: 10px;
+  width: 300px;
+  height: calc(75vh - 10px);
+  background: #12122a;
+  border: 1px solid rgba(108, 99, 255, 0.25);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  box-sizing: border-box;
+  z-index: 15;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.4);
+}
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.chat-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(108, 99, 255, 0.2);
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.chat-display {
+  border-radius: 10px;
+  border: 1px solid rgba(108, 99, 255, 0.15);
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.chat-display::-webkit-scrollbar {
+  width: 4px;
+}
+
+.chat-display::-webkit-scrollbar-thumb {
+  background: rgba(108, 99, 255, 0.4);
+  border-radius: 4px;
+}
+
+.chat-empty-msg {
+  color: #8888aa;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.chat-message-row {
+  margin-bottom: 12px;
+  margin-left: 8px;
+}
+
+.chat-sender {
+  font-weight: 600;
+  font-size: 0.82rem;
+  color: #6c63ff;
+  margin: 0 0 2px 0;
+}
+
+.chat-msg-text {
+  font-size: 0.9rem;
+  color: #e8e8f0;
+  word-break: break-word;
+  margin: 0;
+}
+
+.chat-input-area {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.chat-text-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(108, 99, 255, 0.4);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-family: "Inter", sans-serif;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.chat-text-input:focus {
+  border-color: #6c63ff;
+}
+
+.chat-text-input::placeholder {
+  color: #8888aa;
+}
+
+.chat-send-btn {
+  background: transparent;
+  border: none;
+  color: #6c63ff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+
+.chat-send-btn:hover {
+  color: #00d4aa;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .chat-room {
+    width: 260px;
+    height: 45vh;
+  }
+  .meet-user-video {
+    width: 120px;
+    bottom: 110px;
+  }
+}
+
+@media (max-width: 768px) {
+  .meet-video-container {
+    flex-direction: column;
+  }
+  .chat-room {
+    width: 100%;
+    height: 38vh;
+    border-radius: 14px 14px 0 0;
+    right: 0;
+    bottom: 75px;
+  }
+  .meet-user-video {
+    width: 90px;
+    bottom: 125px;
+    left: 8px;
+  }
+  .meet-control-btn {
+    width: 46px;
+    height: 46px;
+  }
+  .meet-end-btn {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .meet-user-video {
+    width: 75px;
+  }
+  .chat-room {
+    height: 32vh;
+  }
+}

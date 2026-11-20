@@ -1,0 +1,177 @@
+/* ===== MEETING HISTORY PAGE ===== */
+
+.history-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d0d1a 0%, #12122a 100%);
+  font-family: "Inter", sans-serif;
+  color: white;
+}
+
+/* Navbar */
+.history-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1rem 2rem;
+  background: #12122a;
+  border-bottom: 1px solid rgba(108, 99, 255, 0.2);
+}
+
+.history-back-btn {
+  background: transparent;
+  border: none;
+  color: #6c63ff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.history-back-btn:hover {
+  background: rgba(108, 99, 255, 0.15);
+}
+
+.history-nav-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+  background: linear-gradient(90deg, #6c63ff, #00d4aa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.history-nav-sub {
+  color: #8888aa;
+  font-size: 0.9rem;
+  margin-left: 4px;
+}
+
+/* History Content Container */
+.history-content {
+  padding: 2rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.history-heading {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #e8e8f0;
+}
+
+/* Loading & Empty state */
+.history-loading {
+  color: #8888aa;
+  text-align: center;
+  margin-top: 4rem;
+}
+
+.history-empty-card {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(108, 99, 255, 0.15);
+  border-radius: 16px;
+}
+
+.history-empty-icon {
+  font-size: 3rem !important;
+  color: #6c63ff;
+  margin-bottom: 1rem;
+}
+
+.history-empty-text {
+  color: #8888aa;
+  font-size: 0.95rem;
+}
+
+/* Meetings List */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.history-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(108, 99, 255, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.history-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(108, 99, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.history-card-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.history-icon-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(108, 99, 255, 0.15), rgba(0, 212, 170, 0.15));
+  border: 1px solid rgba(108, 99, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c63ff;
+}
+
+.history-code-title {
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+.history-code-sub {
+  margin: 2px 0 0;
+  color: #8888aa;
+  font-size: 0.8rem;
+}
+
+.history-card-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.history-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #8888aa;
+  font-size: 0.85rem;
+}
+
+.history-rejoin-btn {
+  color: #00d4aa;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: rgba(0, 212, 170, 0.1);
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 212, 170, 0.3);
+  transition: background 0.2s;
+}
+
+.history-card:hover .history-rejoin-btn {
+  background: rgba(0, 212, 170, 0.2);
+}
